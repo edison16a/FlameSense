@@ -15,16 +15,31 @@
  * at the pre-refactor revision of index.html and it regenerates the same data.
  *
  * Usage:
- *   node tools/extract-data.mjs [path/to/index.html] [--out public/data]
+ *   node tools/extract-data.mjs                      # from the pinned revision
+ *   node tools/extract-data.mjs --rev <git-rev>
+ *   node tools/extract-data.mjs --from path/to.html  # from a file instead
+ *   node tools/extract-data.mjs --out public/data
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "..");
+
+/**
+ * The revision whose index.html is the authority on the page's content.
+ *
+ * The source is historical by design. Once the refactor landed, the working
+ * tree's index.html became a skeleton with no copy in it, so there is nothing
+ * left on disk to extract from -- the original page exists only in git. Reading
+ * from a fixed revision also means re-running this script is idempotent and
+ * cannot be influenced by later edits to the working tree.
+ */
+const DEFAULT_SOURCE_REV = "879edf3";
 
 /**
  * Collapse HTML source whitespace the way a browser's inline formatting
@@ -55,6 +70,22 @@ function requireMatch(source, re, what) {
 }
 
 /**
+ * Directory the site's own images live in, relative to `public/`.
+ *
+ * The source revision predates the move of the screenshots out of the web root,
+ * so its markup references them as bare filenames. Rewriting them here keeps
+ * the extraction reproducible against that fixed revision without the data file
+ * pointing at paths that no longer exist. Remote images are left untouched.
+ */
+const ASSET_DIR = "assets/";
+
+/** Re-point a local image at the assets directory; pass remote URLs through. */
+function resolveImagePath(src) {
+  if (/^https?:/.test(src) || src.startsWith(ASSET_DIR)) return src;
+  return ASSET_DIR + src;
+}
+
+/**
  * Extract the five "How We Did It" panels.
  *
  * Each is a <section class="section container" id="..."> holding an image and
@@ -72,7 +103,7 @@ function extractSteps(html) {
     const text = requireMatch(body, /<p>([\s\S]*?)<\/p>/, `paragraph in #${id}`)[1];
     steps.push({
       id,
-      image: src,
+      image: resolveImagePath(src),
       alt: decodeEntities(collapseWhitespace(alt)),
       heading: decodeEntities(collapseWhitespace(heading)),
       body: decodeEntities(collapseWhitespace(text)),
@@ -202,14 +233,31 @@ function extractCities(html) {
   return cities.map(({ name, coords, risk }) => ({ name, coords, risk }));
 }
 
+/**
+ * Read the source page, either from a given file or from git history.
+ *
+ * @param {string | undefined} file Explicit path, for re-running against a
+ *   working copy; omit to use the pinned revision.
+ * @param {string} rev Revision to read `public/index.html` from.
+ * @returns {string}
+ */
+function readSource(file, rev) {
+  if (file) return readFileSync(resolve(REPO_ROOT, file), "utf8");
+  return execFileSync("git", ["show", `${rev}:public/index.html`], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+    maxBuffer: 16 * 1024 * 1024,
+  });
+}
+
 function main() {
   const args = process.argv.slice(2);
-  const outFlag = args.indexOf("--out");
-  const outDir = resolve(REPO_ROOT, outFlag === -1 ? "public/data" : args[outFlag + 1]);
-  const inputArg = args.find((a, i) => !a.startsWith("--") && (outFlag === -1 || i !== outFlag + 1));
-  const input = resolve(REPO_ROOT, inputArg ?? "public/index.html");
-
-  const html = readFileSync(input, "utf8");
+  const valueOf = (flag, fallback) => {
+    const i = args.indexOf(flag);
+    return i === -1 ? fallback : args[i + 1];
+  };
+  const outDir = resolve(REPO_ROOT, valueOf("--out", "public/data"));
+  const html = readSource(valueOf("--from", undefined), valueOf("--rev", DEFAULT_SOURCE_REV));
   const { overlays, footer, title } = extractChrome(html);
 
   const content = {
