@@ -1,0 +1,75 @@
+{
+  "document": {
+    "title": "FlameSense - Wildfire Analytics"
+  },
+  "nav": {
+    "logo": {
+      "id": "homeBtn",
+      "label": "🔥 FlameSense"
+    },
+    "items": [
+      {
+        "id": "aboutNav",
+        "label": "About"
+      },
+      {
+        "id": "howNav",
+        "label": "How We Did It"
+      },
+      {
+        "id": "demoNav",
+        "label": "Predict"
+      }
+    ]
+  },
+  "hero": {
+    "headingBefore": "Welcome to",
+    "flame": "🔥",
+    "headingAfter": "FlameSense",
+    "tagline": "Using Machine Learning and Palantir AIP to Revolutionize wildfire spread prediction",
+    "ctaId": "demoBtn",
+    "ctaLabel": "Predict Fires"
+  },
+  "steps": [
+    {
+      "id": "how",
+      "image": "assets/data.png",
+      "alt": "Data Collection",
+      "heading": "Step 1: Data Collection",
+      "body": "We gathered current and historical wildfire and conditions data from various sources such as NASA FIRMS and Open Meteo. We collected factors such as humidity, temperature, dryness, and biomass. We then used Palantir's tools to clean and transform the data."
+    },
+    {
+      "id": "how2",
+      "image": "https://www.couchbase.com/blog/wp-content/uploads/2021/10/training-data-jupyter-notebook.png",
+      "alt": "Data Cleaning",
+      "heading": "Step 2: Training",
+      "body": "We then used the cleaned data to train a model in Palantir which would take in current data inputs such as humidity, temperature, dryness, and biomass and outputs a predicted fire radius."
+    },
+    {
+      "id": "how3",
+      "image": "assets/expose.png",
+      "alt": "Data Integration",
+      "heading": "Step 3: Exposing Function",
+      "body": "We then converted the model into a typescript function. Then we exposed the function to be called through javascript."
+    },
+    {
+      "id": "how4",
+      "image": "assets/frontend.png",
+      "alt": "Model Training",
+      "heading": "Step 4: FrontEnd",
+      "body": "We built a front end in HTML which displays a map and animates how the fire will spread depending on a location."
+    },
+    {
+      "id": "how5",
+      "image": "https://media.istockphoto.com/id/1448152453/vector/big-data-technology-and-data-science-illustration-data-flow-concept-querying-analysing.jpg?s=612x612&w=0&k=20&c=To0lhCrVmDYdSkOUOGxGsjlYe0buj_wwGCDqYhF9p2o=",
+      "alt": "Interactive Visualization",
+      "heading": "Future Plans",
+      "body": "We plan to expand our model and train it with more data to make a more accurate prediction."
+    }
+  ],
+  "mapOverlays": {
+    "timeOverlay": "Please Click at a point to Get Data and Simulate Fire at That Area",
+    "growthOverlay": "Please Click at a Point to Get Percent Growth"
+  },
+  "footer": "© 2025 FlameSense. All rights reserved."
+}
