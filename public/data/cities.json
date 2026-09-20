@@ -1,0 +1,85 @@
+{
+  "description": "Static California city fire-risk reference data carried over from the original page.",
+  "cities": [
+    {
+      "name": "Los Angeles, CA",
+      "coords": [
+        34.0522,
+        -118.2437
+      ],
+      "risk": "Moderate"
+    },
+    {
+      "name": "San Francisco, CA",
+      "coords": [
+        37.7749,
+        -122.4194
+      ],
+      "risk": "High"
+    },
+    {
+      "name": "San Diego, CA",
+      "coords": [
+        32.7157,
+        -117.1611
+      ],
+      "risk": "Low"
+    },
+    {
+      "name": "Sacramento, CA",
+      "coords": [
+        38.5816,
+        -121.4944
+      ],
+      "risk": "Moderate"
+    },
+    {
+      "name": "San Jose, CA",
+      "coords": [
+        37.3382,
+        -121.8863
+      ],
+      "risk": "Moderate"
+    },
+    {
+      "name": "Fresno, CA",
+      "coords": [
+        36.7378,
+        -119.7871
+      ],
+      "risk": "High"
+    },
+    {
+      "name": "Oakland, CA",
+      "coords": [
+        37.8044,
+        -122.2711
+      ],
+      "risk": "Moderate"
+    },
+    {
+      "name": "Santa Barbara, CA",
+      "coords": [
+        34.4208,
+        -119.6982
+      ],
+      "risk": "High"
+    },
+    {
+      "name": "Long Beach, CA",
+      "coords": [
+        33.7701,
+        -118.1937
+      ],
+      "risk": "Low"
+    },
+    {
+      "name": "Bakersfield, CA",
+      "coords": [
+        35.3733,
+        -119.0187
+      ],
+      "risk": "High"
+    }
+  ]
+}
