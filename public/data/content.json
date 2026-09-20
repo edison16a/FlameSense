@@ -27,6 +27,7 @@
     "flame": "🔥",
     "headingAfter": "FlameSense",
     "tagline": "Using Machine Learning and Palantir AIP to Revolutionize wildfire spread prediction",
+    "backgroundImage": "https://cnr.ncsu.edu/news/wp-content/uploads/sites/10/2024/10/wildfire-pine-forest-florida-istock-1146x600-1.jpg",
     "ctaId": "demoBtn",
     "ctaLabel": "Predict Fires"
   },

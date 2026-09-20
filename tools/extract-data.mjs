@@ -120,6 +120,11 @@ function extractHero(html) {
     flame: collapseWhitespace(emoji),
     headingAfter: decodeEntities(collapseWhitespace(after)),
     tagline: decodeEntities(collapseWhitespace(requireMatch(hero, /<p>([\s\S]*?)<\/p>/, "hero tagline")[1])),
+    // The hero photograph is referenced from CSS (`.hero { background: url(...) }`)
+    // rather than from markup, which meant a piece of visible content was only
+    // changeable by editing a stylesheet. Lift it out so it lives with the rest
+    // of the copy; the renderer feeds it back in through a custom property.
+    backgroundImage: requireMatch(html, /\.hero\s*\{[\s\S]*?background:\s*url\('([^']+)'\)/, "hero background image")[1],
     ctaId: requireMatch(hero, /<button class="btn" id="([^"]+)">/, "hero CTA id")[1],
     ctaLabel: decodeEntities(
       collapseWhitespace(requireMatch(hero, /<button class="btn" id="[^"]+">([\s\S]*?)<\/button>/, "hero CTA label")[1]),
