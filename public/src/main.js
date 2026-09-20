@@ -30,13 +30,6 @@ async function start() {
     overlays,
   });
 
-  /*
-   * EONET popups are Leaflet-rendered HTML strings containing an inline
-   * onclick, so the handler has to be reachable as a global. This is the single
-   * deliberate export onto window; everything else stays module-scoped.
-   */
-  window.simulateExistingFireAt = controller.simulateExistingFireAt;
-
   setupNavigation({
     content: data.content,
     steps,

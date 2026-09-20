@@ -14,29 +14,67 @@ import { reverseGeocode } from "../services/geocode.js";
 import { fetchWeather, selectReading } from "../services/weather.js";
 
 /**
- * Build the HTML for an EONET marker popup.
+ * Build an EONET marker popup as a DOM node.
  *
- * Defined once and used for both the initial popup and the version rewritten
- * after reverse geocoding, which in the original were two separate template
- * literals that had to be kept in step by hand -- the pill button's styling was
- * written out twice.
+ * WAS BROKEN: this popup was assembled as an HTML string that interpolated the
+ * EONET event title and the Nominatim place name directly into markup, then
+ * handed to Leaflet, which inserts it with innerHTML. Both strings come from
+ * third parties. The place name is the dangerous one: Nominatim serves
+ * OpenStreetMap data, which anyone can edit, so a crafted place name was a
+ * script-injection vector into this page -- no authentication needed, just an
+ * OSM edit near a wildfire.
+ *
+ * Building nodes and assigning textContent closes that: the strings are now
+ * unconditionally treated as text, never parsed as markup.
+ *
+ * The simulate button also gets a real listener instead of an inline onclick
+ * attribute. Besides removing a second injection surface (the coordinates were
+ * interpolated into an attribute), this is what lets the handler stop being a
+ * global -- inline handlers can only resolve names on window.
  *
  * @param {object} params
- * @param {string} params.title Event title.
- * @param {string} params.subtitle Either a timestamp or a resolved place name.
- * @param {number} params.lat
- * @param {number} params.lng
- * @param {number} params.radius Impact radius in metres.
+ * @param {string} params.title Event title, from EONET.
+ * @param {Node[]} params.subtitle Pre-built subtitle nodes.
  * @param {string} params.buttonLabel
- * @returns {string}
+ * @param {() => void} params.onSimulate
+ * @returns {HTMLElement}
  */
-function buildPopupHtml({ title, subtitle, lat, lng, radius, buttonLabel }) {
-  return (
-    `<b>${title}</b><br>${subtitle}<br>` +
-    `<div class="popup-actions">` +
-    `<button class="popup-simulate" onclick="simulateExistingFireAt(${lat}, ${lng}, ${radius})">` +
-    `${buttonLabel}</button></div>`
-  );
+function buildPopup({ title, subtitle, buttonLabel, onSimulate }) {
+  const container = document.createElement("div");
+
+  const heading = document.createElement("b");
+  heading.textContent = title;
+
+  const actions = document.createElement("div");
+  actions.className = "popup-actions";
+  const button = document.createElement("button");
+  button.className = "popup-simulate";
+  button.type = "button";
+  button.textContent = buttonLabel;
+  button.addEventListener("click", onSimulate);
+  actions.append(button);
+
+  container.append(heading, document.createElement("br"), ...subtitle, actions);
+  return container;
+}
+
+/**
+ * Build the subtitle lines of a popup: a timestamp, then a location.
+ *
+ * Returned as nodes rather than a string for the same reason as above -- the
+ * place name is untrusted -- and kept separate so the initial popup and the
+ * geocoded rewrite cannot drift apart.
+ *
+ * @param {string} timestamp Already localised.
+ * @param {string} location Coordinates, or a resolved place name.
+ * @returns {Node[]}
+ */
+function buildSubtitle(timestamp, location) {
+  const line = document.createElement("div");
+  line.textContent = timestamp;
+  const place = document.createElement("div");
+  place.textContent = `Location: ${location}`;
+  return [line, place];
 }
 
 /**
@@ -142,36 +180,25 @@ export function createMapController({ L, config, phases, growth, overlays }) {
       iconAnchor: markerConfig.iconAnchor,
     });
 
-    const popupFor = (subtitle) =>
-      buildPopupHtml({
+    const timestamp = new Date(event.date).toLocaleString();
+    const popupFor = (location) =>
+      buildPopup({
         title: event.title,
-        subtitle,
-        lat: event.lat,
-        lng: event.lng,
-        radius: event.impactRadiusMetres,
+        subtitle: buildSubtitle(timestamp, location),
         buttonLabel: simulateButtonLabel,
+        onSimulate: () =>
+          simulateExistingFireAt(event.lat, event.lng, event.impactRadiusMetres),
       });
 
     const marker = L.marker([event.lat, event.lng], { icon }).addTo(map);
-    marker.bindPopup(
-      popupFor(
-        `${new Date(event.date).toLocaleString()}<br>` +
-          `Location: ${event.lat.toFixed(config.weather.coordinateDecimals)}, ` +
-          `${event.lng.toFixed(config.weather.coordinateDecimals)}`,
-      ),
-    );
+    const decimals = config.weather.coordinateDecimals;
+    marker.bindPopup(popupFor(`${event.lat.toFixed(decimals)}, ${event.lng.toFixed(decimals)}`));
 
     // The place name is resolved lazily on click rather than up front: there
     // can be dozens of events and Nominatim asks callers not to bulk-query it.
     marker.on("click", () => {
       reverseGeocode(config.geocoding, event.lat, event.lng)
-        .then((place) => {
-          marker
-            .getPopup()
-            .setContent(
-              popupFor(`${new Date(event.date).toLocaleString()}<br>Location: ${place}`),
-            );
-        })
+        .then((place) => marker.getPopup().setContent(popupFor(place)))
         .catch((error) => console.error("Reverse geocoding error:", error));
     });
 
