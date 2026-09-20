@@ -1,0 +1,91 @@
+{
+  "$comment": "Runtime configuration for the map view. Every upstream service, URL, magic number and marker style the page depends on lives here so that retargeting a tile server, widening the event filter or tuning the fallback radius needs no code change.",
+
+  "map": {
+    "$comment": "Initial camera. [36.7783, -119.4179] at zoom 6 frames the state of California, which is the whole area the project covers.",
+    "initialCenter": [36.7783, -119.4179],
+    "initialZoom": 6,
+    "tileLayer": {
+      "urlTemplate": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "attribution": "&copy; OpenStreetMap contributors"
+    },
+    "$comment_defaultFire": "On entering the map view the page immediately draws one simulated fire so the screen is never empty. These are downtown Los Angeles coordinates.",
+    "defaultFireCenter": [34.0522, -118.2437]
+  },
+
+  "weather": {
+    "$comment": "Open-Meteo forecast API. Keyless. 'current' drives the overlay and the growth model; 'hourly' is requested but only logged today.",
+    "endpoint": "https://api.open-meteo.com/v1/forecast",
+    "timezone": "America/Los_Angeles",
+    "hourly": [
+      "temperature_2m",
+      "rain",
+      "relative_humidity_2m",
+      "soil_moisture_1_to_3cm",
+      "vapour_pressure_deficit",
+      "visibility",
+      "wind_speed_180m",
+      "wind_direction_180m",
+      "temperature_180m",
+      "wind_gusts_10m"
+    ],
+    "current": [
+      "rain",
+      "surface_pressure",
+      "wind_direction_10m",
+      "wind_gusts_10m",
+      "wind_speed_10m",
+      "temperature_2m",
+      "relative_humidity_2m",
+      "vapour_pressure_deficit"
+    ],
+    "$comment_readout": "Order and labelling of the overlay readout. 'key' indexes into the API's `current` object; omitting an entry removes that row from the overlay.",
+    "readout": [
+      { "key": "rain", "label": "Rain", "unit": " mm" },
+      { "key": "surface_pressure", "label": "Surface Pressure", "unit": " hPa" },
+      { "key": "wind_direction_10m", "label": "Wind Direction", "unit": "°" },
+      { "key": "wind_gusts_10m", "label": "Wind Gusts", "unit": " km/h" },
+      { "key": "wind_speed_10m", "label": "Wind Speed", "unit": " km/h" },
+      { "key": "temperature_2m", "label": "Temperature", "unit": "°C" },
+      { "key": "relative_humidity_2m", "label": "Relative Humidity", "unit": "%" },
+      { "key": "vapour_pressure_deficit", "label": "Vapour Pressure Deficit", "unit": "" }
+    ],
+    "$comment_legacyReadout": "Fallback shape for the older `current_weather` response, kept because the original page handled both.",
+    "legacyReadout": [
+      { "key": "temperature", "label": "Temperature", "unit": "°C" },
+      { "key": "windspeed", "label": "Wind Speed", "unit": " km/h" }
+    ],
+    "noDataMessage": "No current weather data available.",
+    "coordinateDecimals": 4
+  },
+
+  "eonet": {
+    "$comment": "NASA Earth Observatory Natural Event Tracker, v3. Only open wildfire events are requested.",
+    "endpoint": "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&category=wildfires",
+    "$comment_minEventYear": "Events older than this are skipped. This was hard-coded as 2025 in the original page; it is config now, but the value is left exactly as it shipped.",
+    "minEventYear": 2025,
+    "$comment_radius": "EONET reports wildfire magnitude in acres. Treating the burn as a circle, radius = sqrt(area / pi); 4046.8564224 is the exact square metres in an international acre.",
+    "acresToSquareMetres": 4046.8564224,
+    "fallbackImpactRadiusMetres": 10000,
+    "marker": {
+      "html": "🔥",
+      "className": "custom-fire-icon",
+      "iconSize": [30, 30],
+      "iconAnchor": [15, 15]
+    },
+    "impactCircleStyle": {
+      "color": "red",
+      "fillColor": "#f03",
+      "fillOpacity": 0.2
+    },
+    "simulateButtonLabel": "Simulate Fire"
+  },
+
+  "geocoding": {
+    "$comment": "OpenStreetMap Nominatim reverse geocoder, used to turn an event's coordinates into a place name when its marker is clicked.",
+    "endpoint": "https://nominatim.openstreetmap.org/reverse?format=jsonv2",
+    "$comment_placeKeys": "Tried in order against the Nominatim `address` object; the first present value wins. Ordered most to least specific.",
+    "placeKeys": ["city", "town", "village", "county"],
+    "unknownPlaceLabel": "Unknown location"
+  }
+}
