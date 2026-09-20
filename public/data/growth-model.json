@@ -1,0 +1,36 @@
+{
+  "$comment": "Coefficients for the heuristic 'growth percentage' shown under the weather readout, and for turning that percentage into a radius multiplier. These numbers encode the project's fire-spread intuition, so they are the values most likely to be retuned -- they belong in data, not scattered through a function body.",
+
+  "percentage": {
+    "$comment": "score = base + jitter + (temp - tempReference) * tempCoefficient - rain * rainCoefficient + (humidityReference - humidity) * humidityCoefficient, clamped and rounded.",
+
+    "base": 50,
+    "$comment_jitter": "A random swing of +/-10 around the base, present in the original so repeated clicks on one spot do not read as a single fixed number. It makes the output non-deterministic by design.",
+    "jitter": { "min": -10, "range": 20 },
+
+    "$comment_temperature": "Hotter than the 20 C reference pushes growth up, 1.2 points per degree.",
+    "temperature": { "reference": 20, "coefficient": 1.2 },
+
+    "$comment_rain": "Rain is the strongest single suppressor: 10 points removed per millimetre.",
+    "rain": { "coefficient": 10 },
+
+    "$comment_humidity": "Air drier than 50% relative humidity pushes growth up, 0.3 points per point of dryness; damper air pulls it down.",
+    "humidity": { "reference": 50, "coefficient": 0.3 },
+
+    "clamp": { "min": 0, "max": 100 },
+    "decimals": 1,
+
+    "$comment_defaults": "Substituted when a reading is absent from the API response.",
+    "defaults": { "rain": 0, "temperature": 20, "humidity": 50 }
+  },
+
+  "factor": {
+    "$comment": "Converts the percentage into a radius multiplier: every point above the pivot adds 0.01. 50% therefore means 1.0 (no change), 100% means 1.5 and 0% means 0.5.",
+    "pivot": 50,
+    "perPercent": 0.01,
+    "$comment_default": "Used before any weather has been fetched, chosen to equal the pivot so the multiplier starts at exactly 1.0.",
+    "default": 50,
+    "$comment_clamp": "The original had a clamp to 0.5-1.5 written but commented out. Left disabled so behaviour is unchanged; set `enabled` to true to switch it on.",
+    "clamp": { "enabled": false, "min": 0.5, "max": 1.5 }
+  }
+}
