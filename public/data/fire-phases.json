@@ -1,0 +1,134 @@
+{
+  "$comment": "Declarative tables for the two fire-spread animations. The original had eight near-identical functions (animatePhase1..4 and animateExistingPhase1..4) that looked interchangeable but were not: they differ in duration, scaling, offset growth and -- critically -- in where each phase's opening shape comes from. Encoding those differences as data makes the divergence explicit instead of something you have to diff by eye.",
+
+  "geometry": {
+    "$comment_wind": "Each vertex radius is multiplied by 1 + amplitude*cos(vertexAngle - windDirection), clamped, so the blob stretches downwind. Clamps keep the shape convex-ish rather than collapsing to a crescent.",
+    "windBias": { "amplitude": 0.4, "minFactor": 0.6, "maxFactor": 1.4 },
+    "$comment_projection": "Flat-earth approximation, adequate at the few-kilometre scale of a single fire. 111320 m is one degree of latitude; longitude degrees shrink by cos(latitude), derived from the 40075000 m equatorial circumference.",
+    "metresPerDegreeLatitude": 111320,
+    "equatorialCircumferenceMetres": 40075000
+  },
+
+  "polygonStyle": {
+    "$comment": "Shared Leaflet style for every fire polygon. Stroke and fill always share a colour; only the colour changes per phase.",
+    "fillOpacity": 0.6
+  },
+
+  "$comment_reorder": "After the last phase the stack is re-fronted smallest-first so earlier, tighter polygons stay visible above the later, larger ones. The short delay lets Leaflet finish the final render first.",
+  "reorderDelayMs": 100,
+
+  "sequences": {
+    "clicked": {
+      "$comment": "Runs when the user clicks empty map. Slow (7 s a phase) and continuous: phases 2-4 open exactly where the previous phase closed, so the blob morphs without ever jumping.",
+      "numSides": 20,
+      "baseRadiusMetres": 1000,
+      "initialOffset": { "min": 500, "range": 1000 },
+      "initialAngleOffset": { "min": -0.2, "range": 0.4 },
+      "phases": [
+        {
+          "$comment": "Pure scale-up with no colour change and no offset growth. This is the only phase in either sequence that recomputes vertices from scale each frame rather than interpolating between two vertex lists.",
+          "kind": "scale",
+          "durationMs": 7000,
+          "startScale": 1,
+          "endScale": 1.2,
+          "strokeColor": "#ff0000",
+          "startColor": "#ff0000",
+          "endColor": "#ff0000",
+          "nextAngleOffset": { "min": -0.15, "range": 0.3 }
+        },
+        {
+          "$comment": "startFrom 'previous' is what makes this sequence continuous: the new polygon is drawn on the closing vertices of the phase before it.",
+          "kind": "morph",
+          "startFrom": "previous",
+          "durationMs": 7000,
+          "targetScale": 1.4,
+          "offsetGrowth": { "min": 100, "range": 200 },
+          "strokeColor": "#ff0000",
+          "startColor": "#ff0000",
+          "endColor": "#ff7f00",
+          "nextAngleOffset": { "min": -0.1, "range": 0.2 }
+        },
+        {
+          "kind": "morph",
+          "startFrom": "previous",
+          "durationMs": 7000,
+          "targetScale": 1.55,
+          "offsetGrowth": { "min": 100, "range": 200 },
+          "strokeColor": "#ff7f00",
+          "startColor": "#ff7f00",
+          "endColor": "#ffff00",
+          "nextAngleOffset": { "min": -0.05, "range": 0.1 }
+        },
+        {
+          "$comment": "Final phase: no nextAngleOffset, so the runner stops and triggers the re-order instead of chaining.",
+          "kind": "morph",
+          "startFrom": "previous",
+          "durationMs": 7000,
+          "targetScale": 1.7,
+          "offsetGrowth": { "min": 100, "range": 200 },
+          "strokeColor": "#ffff00",
+          "startColor": "#ffff00",
+          "endColor": "#00ff00"
+        }
+      ]
+    },
+
+    "existing": {
+      "$comment": "Runs from the Simulate Fire button on a real EONET event. Faster (3 s a phase), grows by much larger offsets, and never scales -- the starting radius already comes from the event's reported acreage, so all growth is expressed through the offsets.",
+      "numSides": 20,
+      "$comment_baseRadius": "Deliberately absent: this sequence's base radius is the event's own impact radius, supplied per-call.",
+      "initialOffset": { "min": 0, "range": 50 },
+      "initialAngleOffset": { "min": -0.2, "range": 0.4 },
+      "phases": [
+        {
+          "$comment": "startFrom 'recomputed' reproduces the original faithfully: every phase rebuilds its opening vertices from the current offsets at the CURRENT angle offset. Because each phase draws a fresh angle, the shape visibly snaps at every phase boundary. That jump is in the shipped behaviour and is preserved on purpose, not an artefact of this refactor.",
+          "kind": "morph",
+          "startFrom": "recomputed",
+          "durationMs": 3000,
+          "startScale": 1,
+          "targetScale": 1,
+          "offsetGrowth": { "min": 500, "range": 1250 },
+          "strokeColor": "#ff0000",
+          "startColor": "#ff0000",
+          "endColor": "#ff0000",
+          "nextAngleOffset": { "min": -0.15, "range": 0.3 }
+        },
+        {
+          "kind": "morph",
+          "startFrom": "recomputed",
+          "durationMs": 3000,
+          "startScale": 1,
+          "targetScale": 1,
+          "offsetGrowth": { "min": 500, "range": 1250 },
+          "strokeColor": "#ff0000",
+          "startColor": "#ff0000",
+          "endColor": "#ff7f00",
+          "nextAngleOffset": { "min": -0.1, "range": 0.2 }
+        },
+        {
+          "kind": "morph",
+          "startFrom": "recomputed",
+          "durationMs": 3000,
+          "startScale": 1,
+          "targetScale": 1,
+          "offsetGrowth": { "min": 500, "range": 1250 },
+          "strokeColor": "#ff7f00",
+          "startColor": "#ff7f00",
+          "endColor": "#ffff00",
+          "nextAngleOffset": { "min": -0.05, "range": 0.1 }
+        },
+        {
+          "kind": "morph",
+          "startFrom": "recomputed",
+          "durationMs": 3000,
+          "startScale": 1,
+          "targetScale": 1,
+          "offsetGrowth": { "min": 500, "range": 1250 },
+          "strokeColor": "#ffff00",
+          "startColor": "#ffff00",
+          "endColor": "#00ff00"
+        }
+      ]
+    }
+  }
+}
