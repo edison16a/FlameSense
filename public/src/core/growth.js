@@ -22,6 +22,32 @@
  */
 
 /**
+ * First genuinely numeric value from `candidates`, else `fallback`.
+ *
+ * WAS BROKEN: the original wrote `parseFloat(x) || fallback`, which treats a
+ * parsed 0 as absent, because 0 is falsy. Every quantity this model reads can
+ * legitimately be zero, so real readings were being replaced by invented ones:
+ * a temperature of 0 C was scored as 20 C, and 0% relative humidity -- the
+ * driest, highest-risk case there is -- was scored as a middling 50%. The
+ * humidity case is the damaging one, since it pushed the growth score DOWN by
+ * 15 points in precisely the conditions where fire spreads fastest.
+ *
+ * Checking for NaN instead of falsiness distinguishes "no reading" from
+ * "a reading of zero".
+ *
+ * @param {unknown[]} candidates Tried in order.
+ * @param {number} fallback
+ * @returns {number}
+ */
+function firstNumber(candidates, fallback) {
+  for (const candidate of candidates) {
+    const value = parseFloat(candidate);
+    if (!Number.isNaN(value)) return value;
+  }
+  return fallback;
+}
+
+/**
  * Build a growth model bound to a set of coefficients.
  *
  * Returned as a closure over config rather than a set of free functions because
@@ -61,12 +87,14 @@ export function createGrowthModel(config, random = Math.random) {
    * @returns {string} The score fixed to the configured number of decimals.
    */
   function computePercentage(weather) {
-    const rain = parseFloat(weather.rain) || p.defaults.rain;
-    const temperature =
-      parseFloat(weather.temperature_2m) ||
-      parseFloat(weather.temperature) ||
-      p.defaults.temperature;
-    const humidity = parseFloat(weather.relative_humidity_2m) || p.defaults.humidity;
+    const rain = firstNumber([weather.rain], p.defaults.rain);
+    const temperature = firstNumber(
+      // Newer Open-Meteo responses use `temperature_2m`; the older
+      // `current_weather` block calls the same quantity `temperature`.
+      [weather.temperature_2m, weather.temperature],
+      p.defaults.temperature,
+    );
+    const humidity = firstNumber([weather.relative_humidity_2m], p.defaults.humidity);
 
     // Start near the midpoint with a deliberate random swing, so repeated
     // clicks on one location do not read as a single authoritative figure.
