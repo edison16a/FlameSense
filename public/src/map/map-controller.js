@@ -179,11 +179,27 @@ export function createMapController({ L, config, phases, growth, overlays }) {
   }
 
   /**
-   * Create the map and populate it.
+   * Create the map and populate it, or re-enter an already-created one.
+   *
+   * WAS BROKEN: this ran unconditionally every time the Predict view opened,
+   * calling L.map() again on a container Leaflet had already initialised.
+   * Leaflet throws "Map container is already initialized" in that case, so the
+   * second visit -- Predict, then About, then Predict -- died with an
+   * exception and left a dead map behind. Guarding on the existing instance
+   * fixes it.
+   *
+   * invalidateSize() is needed on re-entry because the section is display:none
+   * while the landing page is showing. Leaflet caches the container size, and a
+   * hidden container measures zero, so without this the tiles would lay out
+   * against stale dimensions.
    *
    * @returns {object} The Leaflet map.
    */
   function init() {
+    if (map) {
+      map.invalidateSize();
+      return map;
+    }
     map = L.map("map").setView(config.map.initialCenter, config.map.initialZoom);
     L.tileLayer(config.map.tileLayer.urlTemplate, {
       attribution: config.map.tileLayer.attribution,
@@ -199,6 +215,8 @@ export function createMapController({ L, config, phases, growth, overlays }) {
 
     loadFireEvents();
 
+    // Retained from the original as belt-and-braces: with the guard above,
+    // init() now runs at most once, so there is never a stale listener to clear.
     map.off("click");
     map.on("click", (e) => {
       startClickedFire(e.latlng);
