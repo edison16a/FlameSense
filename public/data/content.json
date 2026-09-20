@@ -5,20 +5,27 @@
   "nav": {
     "logo": {
       "id": "homeBtn",
-      "label": "🔥 FlameSense"
+      "label": "🔥 FlameSense",
+      "action": "home",
+      "scrollTarget": "hero"
     },
     "items": [
       {
         "id": "aboutNav",
-        "label": "About"
+        "label": "About",
+        "action": "home",
+        "scrollTarget": "hero"
       },
       {
         "id": "howNav",
-        "label": "How We Did It"
+        "label": "How We Did It",
+        "action": "home",
+        "scrollTarget": "how"
       },
       {
         "id": "demoNav",
-        "label": "Predict"
+        "label": "Predict",
+        "action": "map"
       }
     ]
   },
@@ -29,6 +36,7 @@
     "tagline": "Using Machine Learning and Palantir AIP to Revolutionize wildfire spread prediction",
     "backgroundImage": "https://cnr.ncsu.edu/news/wp-content/uploads/sites/10/2024/10/wildfire-pine-forest-florida-istock-1146x600-1.jpg",
     "ctaId": "demoBtn",
+    "action": "map",
     "ctaLabel": "Predict Fires"
   },
   "steps": [

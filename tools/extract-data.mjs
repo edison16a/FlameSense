@@ -82,6 +82,34 @@ function extractSteps(html) {
   return steps;
 }
 
+/**
+ * What each nav control does, keyed by the element id the original used.
+ *
+ * WHY a table rather than parsing: in the source each control's behaviour lived
+ * in its own addEventListener block of imperative statements. There is no
+ * reliable general parse of "what does this handler do", so the behaviour is
+ * transcribed once here -- it is five short entries, not bulk data -- and
+ * emitted into the content file so that adding a nav entry later is a data edit.
+ *
+ * "home" means: if the map view is open, return to the landing page; otherwise
+ * smooth-scroll to `scrollTarget`. All three landing-page controls shared that
+ * shape in the original, differing only in where they scrolled.
+ */
+const NAV_ACTIONS = {
+  homeBtn: { action: "home", scrollTarget: "hero" },
+  aboutNav: { action: "home", scrollTarget: "hero" },
+  howNav: { action: "home", scrollTarget: "how" },
+  demoNav: { action: "map" },
+  demoBtn: { action: "map" },
+};
+
+/** Look up a control's behaviour, failing loudly on an unrecognised id. */
+function actionFor(id) {
+  const action = NAV_ACTIONS[id];
+  if (!action) throw new Error(`extract: no known behaviour for control #${id}`);
+  return action;
+}
+
 /** Extract the fixed navigation bar: the logo plus its three buttons. */
 function extractNav(html) {
   const nav = requireMatch(html, /<nav>([\s\S]*?)<\/nav>/, "nav element")[1];
@@ -94,10 +122,14 @@ function extractNav(html) {
   for (const [, id, label] of nav.matchAll(
     /<div class="nav-button" id="([^"]+)">([\s\S]*?)<\/div>/g,
   )) {
-    items.push({ id, label: decodeEntities(collapseWhitespace(label)) });
+    items.push({ id, label: decodeEntities(collapseWhitespace(label)), ...actionFor(id) });
   }
   return {
-    logo: { id: logoRaw[1], label: decodeEntities(collapseWhitespace(logoRaw[2])) },
+    logo: {
+      id: logoRaw[1],
+      label: decodeEntities(collapseWhitespace(logoRaw[2])),
+      ...actionFor(logoRaw[1]),
+    },
     items,
   };
 }
@@ -126,6 +158,7 @@ function extractHero(html) {
     // of the copy; the renderer feeds it back in through a custom property.
     backgroundImage: requireMatch(html, /\.hero\s*\{[\s\S]*?background:\s*url\('([^']+)'\)/, "hero background image")[1],
     ctaId: requireMatch(hero, /<button class="btn" id="([^"]+)">/, "hero CTA id")[1],
+    ...actionFor(requireMatch(hero, /<button class="btn" id="([^"]+)">/, "hero CTA id")[1]),
     ctaLabel: decodeEntities(
       collapseWhitespace(requireMatch(hero, /<button class="btn" id="[^"]+">([\s\S]*?)<\/button>/, "hero CTA label")[1]),
     ),
