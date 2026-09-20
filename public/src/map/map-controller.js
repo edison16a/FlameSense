@@ -82,9 +82,19 @@ export function createMapController({ L, config, phases, growth, overlays }) {
       console.log("Weather API Data:", data);
 
       const { values, readout } = selectReading(config.weather, data);
-      if (values && values.wind_direction_10m) {
-        windDirection = parseFloat(values.wind_direction_10m);
-      }
+      /*
+       * WAS BROKEN: this tested the bearing for truthiness before storing it.
+       * A bearing of 0 is falsy, so a wind blowing from due north -- one of the
+       * 360 legal values, and the one a calm reading often reports -- was
+       * thrown away, leaving the fire bent by whatever the PREVIOUS location's
+       * wind had been. The stale value then silently steered the spread shape
+       * at the new location.
+       *
+       * Test that the parse produced a number instead, so 0 is kept and only a
+       * genuinely absent or unparseable bearing is ignored.
+       */
+      const bearing = parseFloat(values?.wind_direction_10m);
+      if (!Number.isNaN(bearing)) windDirection = bearing;
 
       overlays.showWeather(lat, lng, values, readout);
       overlays.showGrowth(growth.computePercentage(values ?? {}));
