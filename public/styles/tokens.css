@@ -1,0 +1,63 @@
+/*
+ * Design tokens.
+ *
+ * WHY: the original stylesheet repeated the same handful of literals -- #ff5722
+ * appeared as both the link colour and the primary button, #1f1f1f as both the
+ * nav chip and the footer, and rgba(0,0,0,.5) as three different shadows. There
+ * was no way to tell which repetitions were intentionally the same colour and
+ * which merely happened to coincide, so retheming meant a risky find-and-replace.
+ *
+ * Every value here is carried over unchanged from the original declarations.
+ */
+:root {
+  /* --- Surfaces ----------------------------------------------------------- */
+  --color-page: #121212;
+  /* Raised chips: nav buttons, the logo, and the footer plate. */
+  --color-surface: #1f1f1f;
+  --color-surface-hover: #333;
+
+  /* --- Text --------------------------------------------------------------- */
+  --color-text: #f0f0f0;
+  --color-text-muted: #777;
+
+  /* --- Brand -------------------------------------------------------------- */
+  /* Shared by links and the primary call to action; they were the same literal
+     in the original and are treated as one decision here. */
+  --color-accent: #ff5722;
+  --color-accent-hover: #e64a19;
+
+  /* --- Scrims ------------------------------------------------------------- */
+  /* The nav sits over scrolling content, the hero photo needs darkening for
+     text contrast. Different opacities, so kept as distinct tokens. */
+  --scrim-nav: rgba(0, 0, 0, 0.9);
+  --scrim-hero: rgba(0, 0, 0, 0.6);
+
+  /* --- Elevation ---------------------------------------------------------- */
+  --shadow-chip: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-panel: 0 4px 12px rgba(0, 0, 0, 0.7);
+  --shadow-overlay: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+  /* --- Map overlays ------------------------------------------------------- */
+  /* These read white-on-black rather than following the dark theme because the
+     overlays sit on top of a light street map. See map.css for the history. */
+  --color-overlay-surface: #ffffff;
+  --color-overlay-text: #000000;
+
+  /* --- Shape and motion --------------------------------------------------- */
+  /* 12px was used for every rounded corner on the page except the EONET popup
+     button, which is a pill; that one stays local to its component. */
+  --radius: 12px;
+  --transition-fast: 0.3s;
+  --transition-reveal: 0.6s;
+
+  /* --- Layout ------------------------------------------------------------- */
+  /* Height reserved for the fixed nav. The map view offsets itself by this so
+     it is not hidden underneath. */
+  --nav-offset: 80px;
+
+  /* --- Content ------------------------------------------------------------ */
+  /* Supplied at runtime from data/content.json (hero.backgroundImage) so the
+     hero photograph is editable without touching CSS. The fallback keeps the
+     hero from collapsing to a blank box if the content file fails to load. */
+  --hero-background-image: none;
+}

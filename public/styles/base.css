@@ -1,0 +1,30 @@
+/*
+ * Element-level defaults: reset, page canvas and typography.
+ *
+ * Kept separate from layout so that "what every element does by default" is
+ * readable without scrolling past component rules.
+ */
+
+/*
+ * Blanket reset. A universal selector is heavy-handed by modern standards, but
+ * the entire layout was authored against it -- every padding and margin on the
+ * page assumes a zeroed baseline -- so narrowing it would silently shift
+ * spacing everywhere. Preserved deliberately.
+ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background: var(--color-page);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}

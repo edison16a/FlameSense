@@ -1,0 +1,87 @@
+/*
+ * The map view: the Leaflet container, the two floating readout overlays and
+ * the custom emoji marker.
+ */
+
+/*
+ * Hidden until the user opens the Predict view; navigation toggles this between
+ * none and block. The nav is fixed and 80px tall, so the map is pushed down by
+ * that much and has its height reduced to match, filling exactly the rest of
+ * the viewport.
+ */
+#map-demo {
+  display: none;
+  height: calc(100vh - var(--nav-offset));
+  margin-top: var(--nav-offset);
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+}
+
+/*
+ * Floating readout panels, anchored to the top-right of the map.
+ *
+ * NOTE on the colours: the original declared an orange translucent background
+ * here and then immediately overrode it to opaque white/black from a second
+ * <style> block using !important. Only the override was ever visible -- the
+ * orange was dead from the moment it was written. The two rules are collapsed
+ * into this single one, which renders identically and removes the need for
+ * !important. This is a CSS no-op, not a restyle.
+ *
+ * white-space: pre-line preserves the line breaks in the placeholder copy while
+ * still letting the injected <br>-separated readout wrap normally.
+ */
+.fire-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--color-overlay-surface);
+  color: var(--color-overlay-text);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  font-size: 1.2rem;
+  /* Matches Leaflet's popup pane so the overlays are not painted under markers. */
+  z-index: 1000;
+  max-width: 320px;
+  white-space: pre-line;
+}
+
+/*
+ * The growth readout is a second overlay stacked beneath the weather one.
+ * Both are absolutely positioned, so the offset is hard-coded to clear the
+ * taller weather panel; it is not derived from that panel's actual height,
+ * which is why a long readout can still collide with it.
+ */
+#growthOverlay {
+  top: 360px;
+}
+
+/*
+ * Leaflet divIcon markers ship with a white box and border by default. Fire
+ * events are rendered as a bare emoji glyph, so both are stripped.
+ */
+.custom-fire-icon {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+}
+
+/* Pill button injected into EONET marker popups to launch a simulation. */
+.popup-simulate {
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.popup-actions {
+  text-align: center;
+  margin-top: 10px;
+}
