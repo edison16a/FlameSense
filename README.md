@@ -6,8 +6,6 @@ FlameSense simulates how a wildfire might spread, using historical fire data and
 current weather like temperature, humidity and wind. Pick a point on the map and
 the predicted growth animates outward as a heat map.
 
-Live site: https://fire-space-front-end-git-main-edison16as-projects.vercel.app/
-
 ## What it does
 
 The landing page explains the project in five steps. The Predict view opens a
