@@ -80,5 +80,11 @@
     "timeOverlay": "Please Click at a point to Get Data and Simulate Fire at That Area",
     "growthOverlay": "Please Click at a Point to Get Percent Growth"
   },
+  "runtime": {
+    "weatherHeading": "Current Data at Latitude {lat}, Longitude {lng}:",
+    "growthLabel": "Growth Percentage:",
+    "growthSuffix": "%",
+    "popupLocationLabel": "Location:"
+  },
   "footer": "© 2025 FlameSense. All rights reserved."
 }

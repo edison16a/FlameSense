@@ -196,6 +196,22 @@ function extractHero(html) {
   };
 }
 
+/**
+ * Copy that the map view builds at runtime rather than storing in markup.
+ *
+ * These strings were assembled inside the overlay and popup code, so a visible
+ * label could only be changed by editing JavaScript. They are transcribed here
+ * because there is nothing in the original markup to parse them out of: they
+ * only ever existed as template literals. Placeholders in braces are filled in
+ * by the renderer.
+ */
+const RUNTIME_COPY = {
+  weatherHeading: "Current Data at Latitude {lat}, Longitude {lng}:",
+  growthLabel: "Growth Percentage:",
+  growthSuffix: "%",
+  popupLocationLabel: "Location:",
+};
+
 /** Extract the two map overlays' placeholder copy and the footer line. */
 function extractChrome(html) {
   const overlays = {};
@@ -266,6 +282,7 @@ function main() {
     hero: extractHero(html),
     steps: extractSteps(html),
     mapOverlays: overlays,
+    runtime: RUNTIME_COPY,
     footer,
   };
 
