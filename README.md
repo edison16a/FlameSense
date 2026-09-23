@@ -8,7 +8,7 @@ historical fire data and current weather conditions like temperature, humidity,
 and wind. Users can select locations on a map to see predicted fire growth
 visualized as a heat map, helping with better resource planning and awareness.
 
-Live site: https://fire-space-front-end-git-main-edison16as-projects.vercel.app/
+Built in ~24 hours. Winner of Los Altos Hacks!
 
 ## What it does
 
