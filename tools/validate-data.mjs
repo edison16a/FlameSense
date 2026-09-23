@@ -95,6 +95,23 @@ check("content: control ids are unique", new Set(controlIds).size === controlIds
 check("content: both map overlays have placeholder copy",
   ["timeOverlay", "growthOverlay"].every((k) => typeof content.mapOverlays?.[k] === "string"));
 
+// Runtime copy is assembled by the map view rather than rendered from markup,
+// so a missing key here surfaces as the literal word "undefined" in an overlay
+// rather than as an error anyone would notice.
+for (const key of ["weatherHeading", "growthLabel", "growthSuffix", "popupLocationLabel"]) {
+  check(`content: runtime copy has ${key}`, typeof content.runtime?.[key] === "string");
+}
+// The heading is the only piece of copy with placeholders in it. Both have to
+// be present, because the renderer leaves an unknown placeholder untouched and
+// a dropped one would silently stop showing the coordinate.
+for (const placeholder of ["{lat}", "{lng}"]) {
+  check(`content: weather heading keeps the ${placeholder} placeholder`,
+    (content.runtime?.weatherHeading ?? "").includes(placeholder));
+}
+check("content: runtime copy uses no unknown placeholders",
+  [...(content.runtime?.weatherHeading ?? "").matchAll(/\{(\w+)\}/g)]
+    .every((m) => ["lat", "lng"].includes(m[1])));
+
 // --- site.config.json -------------------------------------------------------
 for (const [name, url] of [
   ["weather", site.weather.endpoint],
