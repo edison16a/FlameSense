@@ -7,9 +7,9 @@
 
 /*
  * Blanket reset. A universal selector is heavy-handed by modern standards, but
- * the entire layout was authored against it -- every padding and margin on the
- * page assumes a zeroed baseline -- so narrowing it would silently shift
- * spacing everywhere. Preserved deliberately.
+ * the entire layout was authored against it. Every padding and margin on the
+ * page assumes a zeroed baseline, so narrowing it would silently shift spacing
+ * everywhere. Preserved deliberately.
  */
 * {
   margin: 0;

@@ -120,7 +120,7 @@ nav ul li {
 /*
  * Panels start hidden and shifted down; an IntersectionObserver adds .visible
  * when they scroll into view. The starting opacity of 0 is why the observer is
- * load-bearing rather than decorative -- without JavaScript the panels never
+ * load-bearing rather than decorative. Without JavaScript the panels never
  * appear at all. That was true of the original too.
  */
 .section {

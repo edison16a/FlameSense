@@ -1,5 +1,5 @@
 {
-  "$comment": "Coefficients for the heuristic 'growth percentage' shown under the weather readout, and for turning that percentage into a radius multiplier. These numbers encode the project's fire-spread intuition, so they are the values most likely to be retuned -- they belong in data, not scattered through a function body.",
+  "$comment": "Coefficients for the heuristic 'growth percentage' shown under the weather readout, and for turning that percentage into a radius multiplier. These numbers encode the project's fire-spread intuition, so they are the values most likely to be retuned. They belong in data, not scattered through a function body.",
 
   "percentage": {
     "$comment": "score = base + jitter + (temp - tempReference) * tempCoefficient - rain * rainCoefficient + (humidityReference - humidity) * humidityCoefficient, clamped and rounded.",

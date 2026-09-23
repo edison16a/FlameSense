@@ -1,5 +1,5 @@
 {
-  "$comment": "Declarative tables for the two fire-spread animations. The original had eight near-identical functions (animatePhase1..4 and animateExistingPhase1..4) that looked interchangeable but were not: they differ in duration, scaling, offset growth and -- critically -- in where each phase's opening shape comes from. Encoding those differences as data makes the divergence explicit instead of something you have to diff by eye.",
+  "$comment": "Declarative tables for the two fire-spread animations. The original had eight near-identical functions (animatePhase1..4 and animateExistingPhase1..4) that looked interchangeable but were not. They differ in duration, scaling, offset growth and, critically, in where each phase's opening shape comes from. Encoding those differences as data makes the divergence explicit instead of something you have to diff by eye.",
 
   "geometry": {
     "$comment_wind": "Each vertex radius is multiplied by 1 + amplitude*cos(vertexAngle - windDirection), clamped, so the blob stretches downwind. Clamps keep the shape convex-ish rather than collapsing to a crescent.",
@@ -74,7 +74,7 @@
     },
 
     "existing": {
-      "$comment": "Runs from the Simulate Fire button on a real EONET event. Faster (3 s a phase), grows by much larger offsets, and never scales -- the starting radius already comes from the event's reported acreage, so all growth is expressed through the offsets.",
+      "$comment": "Runs from the Simulate Fire button on a real EONET event. Faster (3 s a phase), grows by much larger offsets, and never scales. The starting radius already comes from the event's reported acreage, so all growth is expressed through the offsets.",
       "numSides": 20,
       "$comment_baseRadius": "Deliberately absent: this sequence's base radius is the event's own impact radius, supplied per-call.",
       "initialOffset": { "min": 0, "range": 50 },

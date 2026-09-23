@@ -27,7 +27,7 @@
  *
  * NOTE on the colours: the original declared an orange translucent background
  * here and then immediately overrode it to opaque white/black from a second
- * <style> block using !important. Only the override was ever visible -- the
+ * <style> block using !important. Only the override was ever visible, so the
  * orange was dead from the moment it was written. The two rules are collapsed
  * into this single one, which renders identically and removes the need for
  * !important. This is a CSS no-op, not a restyle.

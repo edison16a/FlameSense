@@ -1,7 +1,7 @@
 /*
  * Design tokens.
  *
- * WHY: the original stylesheet repeated the same handful of literals -- #ff5722
+ * WHY: the original stylesheet repeated the same handful of literals. #ff5722
  * appeared as both the link colour and the primary button, #1f1f1f as both the
  * nav chip and the footer, and rgba(0,0,0,.5) as three different shadows. There
  * was no way to tell which repetitions were intentionally the same colour and
