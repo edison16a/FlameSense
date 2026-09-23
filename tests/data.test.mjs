@@ -8,9 +8,15 @@ import { loadData } from "./helpers/leaflet-stub.mjs";
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 test("the data validator passes against the committed data files", () => {
-  // Runs the real validator, including its fidelity comparison against the
-  // pre-refactor index.html read out of git history. This is the check that
-  // the extraction did not quietly lose or reword any content.
+  // The validator is the single source for every structural rule: colour
+  // handoff between phases, chainable phases, resolvable scroll targets,
+  // readout keys that are actually requested, and the rest. Those rules used to
+  // be written out a second time in this file, which meant two places to update
+  // and no guarantee they agreed. Running the real thing keeps one copy.
+  //
+  // It also performs the fidelity comparison against the pre-refactor
+  // index.html read out of git history, which is the check that the extraction
+  // did not quietly lose or reword any content.
   const output = execFileSync("node", ["tools/validate-data.mjs"], {
     cwd: REPO_ROOT,
     encoding: "utf8",
@@ -32,15 +38,6 @@ test("every nav control declares an action the navigation module understands", a
   }
   // Exactly one nav item and the hero CTA open the map view.
   assert.equal(controls.filter((c) => c.action === "map").length, 2);
-});
-
-test("scroll targets name elements that will exist in the DOM", async () => {
-  const content = await loadData("content.json");
-  const ids = new Set([...content.steps.map((s) => s.id), "hero"]);
-  for (const control of [content.nav.logo, ...content.nav.items]) {
-    if (control.action !== "home") continue;
-    assert.ok(ids.has(control.scrollTarget), `${control.id} scrolls to missing #${control.scrollTarget}`);
-  }
 });
 
 test("the city list survived extraction with all ten records intact", async () => {
@@ -68,30 +65,5 @@ test("the extractor reproduces the committed data files exactly", () => {
     const regenerated = execFileSync("cat", [resolve(outDir, name)], { encoding: "utf8" });
     const committed = execFileSync("cat", [resolve(REPO_ROOT, "public/data", name)], { encoding: "utf8" });
     assert.equal(regenerated, committed, `${name} differs from a fresh extraction`);
-  }
-});
-
-test("phase tables hand colour off cleanly between consecutive phases", async () => {
-  // A mismatch here shows as a visible seam: the new polygon would appear in
-  // one colour and immediately jump to another on its first frame.
-  const phases = await loadData("fire-phases.json");
-  for (const [name, sequence] of Object.entries(phases.sequences)) {
-    for (let i = 0; i < sequence.phases.length; i++) {
-      const phase = sequence.phases[i];
-      assert.equal(phase.strokeColor, phase.startColor, `${name}[${i}] opens on the wrong colour`);
-      if (i > 0) {
-        assert.equal(phase.startColor, sequence.phases[i - 1].endColor, `${name}[${i}] breaks the ramp`);
-      }
-    }
-  }
-});
-
-test("only the final phase of each sequence ends the chain", async () => {
-  const phases = await loadData("fire-phases.json");
-  for (const [name, sequence] of Object.entries(phases.sequences)) {
-    sequence.phases.forEach((phase, i) => {
-      const isLast = i === sequence.phases.length - 1;
-      assert.equal(phase.nextAngleOffset === undefined, isLast, `${name}[${i}]`);
-    });
   }
 });
