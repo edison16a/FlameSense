@@ -21,7 +21,7 @@ async function start() {
   observeStepReveals(steps);
 
   const growth = createGrowthModel(data.growth);
-  const overlays = createOverlays(data.site.weather);
+  const overlays = createOverlays(data.site.weather, data.content.runtime);
   const controller = createMapController({
     L: window.L,
     config: data.site,

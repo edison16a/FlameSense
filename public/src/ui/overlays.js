@@ -2,9 +2,26 @@
  * The two floating readout panels on the map.
  *
  * Kept apart from the weather service so that "what we fetched" and "how we
- * present it" are separable; the readout rows themselves come from
- * `site.config.json`, so adding a field to the panel needs no code.
+ * present it" are separable. Both the readout rows and the surrounding copy
+ * come from data, so relabelling a panel needs no code.
  */
+
+/**
+ * Fill `{name}` placeholders in a copy string.
+ *
+ * The content file stores headings with braces in them so the copy reads as a
+ * whole sentence to whoever is editing it, instead of being split into
+ * fragments that the code concatenates in an order they cannot see.
+ *
+ * @param {string} template Copy containing `{name}` placeholders.
+ * @param {Record<string, string>} values
+ * @returns {string} The template with every placeholder replaced.
+ */
+export function fillTemplate(template, values) {
+  return template.replace(/\{(\w+)\}/g, (match, key) =>
+    key in values ? values[key] : match,
+  );
+}
 
 /**
  * Format a reading as the overlay's `<br>`-separated lines.
@@ -28,9 +45,10 @@ export function formatReadout(values, readout, noDataMessage) {
  * Create bindings to the two overlay elements.
  *
  * @param {object} config The `weather` block of `site.config.json`.
+ * @param {object} copy The `runtime` block of `content.json`.
  * @param {Document} [doc]
  */
-export function createOverlays(config, doc = document) {
+export function createOverlays(config, copy, doc = document) {
   const weatherEl = doc.getElementById("timeOverlay");
   const growthEl = doc.getElementById("growthOverlay");
 
@@ -44,10 +62,13 @@ export function createOverlays(config, doc = document) {
      * @param {Array<{ key: string, label: string, unit: string }>} readout
      */
     showWeather(lat, lng, values, readout) {
-      const heading =
-        `<strong>Current Data at Latitude ${lat.toFixed(config.coordinateDecimals)}, ` +
-        `Longitude ${lng.toFixed(config.coordinateDecimals)}:</strong><br>`;
-      weatherEl.innerHTML = heading + formatReadout(values, readout, config.noDataMessage);
+      const heading = fillTemplate(copy.weatherHeading, {
+        lat: lat.toFixed(config.coordinateDecimals),
+        lng: lng.toFixed(config.coordinateDecimals),
+      });
+      weatherEl.innerHTML =
+        `<strong>${heading}</strong><br>` +
+        formatReadout(values, readout, config.noDataMessage);
     },
 
     /**
@@ -55,7 +76,7 @@ export function createOverlays(config, doc = document) {
      * @param {string} percentage Pre-formatted by the growth model.
      */
     showGrowth(percentage) {
-      growthEl.innerHTML = `<strong>Growth Percentage:</strong> ${percentage}%`;
+      growthEl.innerHTML = `<strong>${copy.growthLabel}</strong> ${percentage}${copy.growthSuffix}`;
     },
   };
 }
