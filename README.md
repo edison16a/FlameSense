@@ -6,6 +6,8 @@ FlameSense simulates how a wildfire might spread, using historical fire data and
 current weather like temperature, humidity and wind. Pick a point on the map and
 the predicted growth animates outward as a heat map.
 
+Built in ~24 hours. Winner of Los Altos Hacks!
+
 ## What it does
 
 The landing page explains the project in five steps. The Predict view opens a
