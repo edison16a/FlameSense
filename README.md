@@ -1,7 +1,5 @@
 # FlameSense
 
-**3rd Place, Los Altos hackathon.**
-
 At Los Altos, we built FlameSense, which helps first responders and the public
 by simulating wildfire spread using a sequential neural network trained on
 historical fire data and current weather conditions like temperature, humidity,
