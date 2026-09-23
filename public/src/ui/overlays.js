@@ -24,7 +24,7 @@ export function fillTemplate(template, values) {
 }
 
 /**
- * Format a reading as the overlay's `<br>`-separated lines.
+ * Format a reading as the overlay's lines of text.
  *
  * Rows come from configuration rather than being eight hard-coded string
  * concatenations, which is what makes adding or reordering a reading a data
@@ -34,11 +34,43 @@ export function fillTemplate(template, values) {
  * @param {object | null} values The API's current-conditions object.
  * @param {Array<{ key: string, label: string, unit: string }>} readout
  * @param {string} noDataMessage Shown when no readable block came back.
- * @returns {string} HTML fragment.
+ * @returns {string[]} One line per row, or a single line when there is no data.
  */
 export function formatReadout(values, readout, noDataMessage) {
-  if (!values) return noDataMessage;
-  return readout.map((row) => `${row.label}: ${values[row.key]}${row.unit}<br>`).join("");
+  if (!values) return [noDataMessage];
+  return readout.map((row) => `${row.label}: ${values[row.key]}${row.unit}`);
+}
+
+/**
+ * Render a bold heading followed by lines of plain text into an element.
+ *
+ * WAS BROKEN: both overlays were written with innerHTML, interpolating values
+ * straight from the weather API into markup. That is the same hole that was
+ * closed in the marker popups, left open here. It is the less likely of the
+ * two to be exploited, since Open-Meteo returns numbers, but "the upstream
+ * currently sends numbers" is not a security boundary: any string the API
+ * returns, now or later, was parsed as HTML.
+ *
+ * Building nodes and assigning textContent means API values can never be
+ * markup. Each line gets its own <div> instead of a trailing <br>, which
+ * renders the same because the overlay is a block container.
+ *
+ * @param {HTMLElement} element
+ * @param {string} heading
+ * @param {string[]} lines
+ */
+function renderPanel(element, heading, lines) {
+  const doc = element.ownerDocument;
+  const strong = doc.createElement("strong");
+  strong.textContent = heading;
+
+  const body = lines.map((line) => {
+    const div = doc.createElement("div");
+    div.textContent = line;
+    return div;
+  });
+
+  element.replaceChildren(strong, ...body);
 }
 
 /**
@@ -66,9 +98,7 @@ export function createOverlays(config, copy, doc = document) {
         lat: lat.toFixed(config.coordinateDecimals),
         lng: lng.toFixed(config.coordinateDecimals),
       });
-      weatherEl.innerHTML =
-        `<strong>${heading}</strong><br>` +
-        formatReadout(values, readout, config.noDataMessage);
+      renderPanel(weatherEl, heading, formatReadout(values, readout, config.noDataMessage));
     },
 
     /**
@@ -76,7 +106,11 @@ export function createOverlays(config, copy, doc = document) {
      * @param {string} percentage Pre-formatted by the growth model.
      */
     showGrowth(percentage) {
-      growthEl.innerHTML = `<strong>${copy.growthLabel}</strong> ${percentage}${copy.growthSuffix}`;
+      // One line, appended to the label rather than stacked under it, so the
+      // growth panel keeps reading as a single sentence.
+      const strong = growthEl.ownerDocument.createElement("strong");
+      strong.textContent = copy.growthLabel;
+      growthEl.replaceChildren(strong, ` ${percentage}${copy.growthSuffix}`);
     },
   };
 }

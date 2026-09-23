@@ -49,16 +49,19 @@ test("a response with neither block yields no reading", () => {
 
 /* ----------------------------------------------------------------- overlays */
 
-test("the readout renders one labelled line per configured row", () => {
-  const html = formatReadout({ rain: 0, temperature_2m: 22 },
+test("the readout returns one labelled line per configured row", () => {
+  const lines = formatReadout({ rain: 0, temperature_2m: 22 },
     [{ key: "rain", label: "Rain", unit: " mm" }, { key: "temperature_2m", label: "Temperature", unit: "°C" }],
     site.weather.noDataMessage);
-  assert.equal(html, "Rain: 0 mm<br>Temperature: 22°C<br>");
+  // Plain strings, not markup. The overlay turns each one into its own node,
+  // so a value from the API can never be parsed as HTML.
+  assert.deepEqual(lines, ["Rain: 0 mm", "Temperature: 22°C"]);
+  assert.ok(lines.every((line) => !line.includes("<")), "lines must carry no markup");
 });
 
 test("the readout falls back to the no-data message", () => {
-  assert.equal(formatReadout(null, site.weather.readout, site.weather.noDataMessage),
-    site.weather.noDataMessage);
+  assert.deepEqual(formatReadout(null, site.weather.readout, site.weather.noDataMessage),
+    [site.weather.noDataMessage]);
 });
 
 test("every configured readout key is actually requested from the API", () => {
