@@ -5,6 +5,7 @@ import { createLeafletStub, loadData } from "./helpers/leaflet-stub.mjs";
 
 const site = await loadData("site.config.json");
 const phases = await loadData("fire-phases.json");
+const content = await loadData("content.json");
 
 /**
  * Minimal DOM stand-in, enough for the popup builder.
@@ -99,6 +100,7 @@ function harness({ leafletOptions = {}, responses = {} } = {}) {
       showWeather: (...args) => overlayCalls.weather.push(args),
       showGrowth: (...args) => overlayCalls.growth.push(args),
     },
+    copy: content.runtime,
   });
   return { controller, record, overlayCalls, growthCalls };
 }

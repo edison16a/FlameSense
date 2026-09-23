@@ -67,13 +67,14 @@ function buildPopup({ title, subtitle, buttonLabel, onSimulate }) {
  *
  * @param {string} timestamp Already localised.
  * @param {string} location Coordinates, or a resolved place name.
+ * @param {string} locationLabel Prefix copy, from the content data.
  * @returns {Node[]}
  */
-function buildSubtitle(timestamp, location) {
+function buildSubtitle(timestamp, location, locationLabel) {
   const line = document.createElement("div");
   line.textContent = timestamp;
   const place = document.createElement("div");
-  place.textContent = `Location: ${location}`;
+  place.textContent = `${locationLabel} ${location}`;
   return [line, place];
 }
 
@@ -86,8 +87,9 @@ function buildSubtitle(timestamp, location) {
  * @param {object} deps.phases Parsed `data/fire-phases.json`.
  * @param {object} deps.growth Growth model from `core/growth.js`.
  * @param {object} deps.overlays Overlay bindings from `ui/overlays.js`.
+ * @param {object} deps.copy The `runtime` block of `content.json`.
  */
-export function createMapController({ L, config, phases, growth, overlays }) {
+export function createMapController({ L, config, phases, growth, overlays, copy }) {
   /** @type {object | null} The Leaflet map, created on first entry to the view. */
   let map = null;
 
@@ -184,7 +186,7 @@ export function createMapController({ L, config, phases, growth, overlays }) {
     const popupFor = (location) =>
       buildPopup({
         title: event.title,
-        subtitle: buildSubtitle(timestamp, location),
+        subtitle: buildSubtitle(timestamp, location, copy.popupLocationLabel),
         buttonLabel: simulateButtonLabel,
         onSimulate: () =>
           simulateExistingFireAt(event.lat, event.lng, event.impactRadiusMetres),

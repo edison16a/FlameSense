@@ -28,6 +28,7 @@ async function start() {
     phases: data.phases,
     growth,
     overlays,
+    copy: data.content.runtime,
   });
 
   setupNavigation({
