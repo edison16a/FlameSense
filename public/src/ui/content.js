@@ -18,25 +18,26 @@
  * the IntersectionObserver reveal keys off `.section`.
  *
  * @param {{ id: string, image: string, alt: string, heading: string, body: string }} step
+ * @param {Document} doc
  * @returns {HTMLElement}
  */
-function renderStep(step) {
-  const section = document.createElement("section");
+function renderStep(step, doc) {
+  const section = doc.createElement("section");
   section.className = "section container";
   section.id = step.id;
 
-  const imageWrap = document.createElement("div");
+  const imageWrap = doc.createElement("div");
   imageWrap.className = "image";
-  const img = document.createElement("img");
+  const img = doc.createElement("img");
   img.src = step.image;
   img.alt = step.alt;
   imageWrap.append(img);
 
-  const textWrap = document.createElement("div");
+  const textWrap = doc.createElement("div");
   textWrap.className = "text";
-  const heading = document.createElement("h2");
+  const heading = doc.createElement("h2");
   heading.textContent = step.heading;
-  const body = document.createElement("p");
+  const body = doc.createElement("p");
   body.textContent = step.body;
   textWrap.append(heading, body);
 
@@ -45,16 +46,16 @@ function renderStep(step) {
 }
 
 /** Populate the fixed navigation bar. */
-function renderNav(nav, content) {
-  const logo = document.createElement("div");
+function renderNav(nav, content, doc) {
+  const logo = doc.createElement("div");
   logo.className = "nav-logo";
   logo.id = content.nav.logo.id;
   logo.textContent = content.nav.logo.label;
 
-  const list = document.createElement("ul");
+  const list = doc.createElement("ul");
   for (const item of content.nav.items) {
-    const li = document.createElement("li");
-    const button = document.createElement("div");
+    const li = doc.createElement("li");
+    const button = doc.createElement("div");
     button.className = "nav-button";
     button.id = item.id;
     button.textContent = item.label;
@@ -73,11 +74,11 @@ function renderNav(nav, content) {
  * content file needing to contain markup. Spaces are re-inserted between the
  * pieces because the extractor stores each part trimmed.
  */
-function renderHero(hero, content) {
+function renderHero(hero, content, doc) {
   hero.style.setProperty("--hero-background-image", `url('${content.hero.backgroundImage}')`);
 
-  const heading = document.createElement("h1");
-  const flame = document.createElement("span");
+  const heading = doc.createElement("h1");
+  const flame = doc.createElement("span");
   flame.className = "fire-emoji";
   flame.textContent = content.hero.flame;
   heading.append(
@@ -86,15 +87,15 @@ function renderHero(hero, content) {
     ` ${content.hero.headingAfter}`,
   );
 
-  const tagline = document.createElement("p");
+  const tagline = doc.createElement("p");
   tagline.textContent = content.hero.tagline;
 
-  const cta = document.createElement("button");
+  const cta = doc.createElement("button");
   cta.className = "btn";
   cta.id = content.hero.ctaId;
   cta.textContent = content.hero.ctaLabel;
 
-  const wrapper = document.createElement("div");
+  const wrapper = doc.createElement("div");
   wrapper.className = "content";
   wrapper.append(heading, tagline, cta);
   hero.replaceChildren(wrapper);
@@ -114,11 +115,11 @@ function renderHero(hero, content) {
  */
 export function renderContent(content, doc = document) {
   doc.title = content.document.title;
-  renderNav(doc.querySelector("nav"), content);
-  renderHero(doc.getElementById("hero"), content);
+  renderNav(doc.querySelector("nav"), content, doc);
+  renderHero(doc.getElementById("hero"), content, doc);
 
   const mapSection = doc.getElementById("map-demo");
-  const steps = content.steps.map(renderStep);
+  const steps = content.steps.map((step) => renderStep(step, doc));
   for (const step of steps) {
     mapSection.parentNode.insertBefore(step, mapSection);
   }
