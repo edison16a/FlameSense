@@ -55,9 +55,29 @@ export function parseFireEvents(response, config) {
   const events = response?.events ?? [];
   const parsed = [];
   for (const event of events) {
-    const geometry = event.geometry[event.geometry.length - 1];
+    /*
+     * WAS BROKEN: this indexed straight into event.geometry and destructured
+     * its coordinates with no guard. An event carrying no geometry array threw
+     * on the first line, and because the throw escaped this function, the
+     * caller's catch swallowed the whole batch. One malformed event meant NO
+     * markers on the map at all, not one missing marker.
+     *
+     * EONET geometry is also not always a Point. Polygon entries nest their
+     * coordinates one level deeper, so the destructure handed back arrays
+     * instead of numbers, and the first toFixed call downstream threw, with
+     * the same all-or-nothing result.
+     *
+     * Skipping entries we cannot place keeps one bad record from hiding every
+     * good one. We deliberately do not try to render Polygon geometry, since
+     * drawing burn outlines would be a new feature rather than a fix.
+     */
+    const geometry = event.geometry?.[event.geometry.length - 1];
+    if (!geometry) continue;
     if (new Date(geometry.date).getFullYear() < config.minEventYear) continue;
-    const [lng, lat] = geometry.coordinates;
+
+    const [lng, lat] = geometry.coordinates ?? [];
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+
     parsed.push({
       title: event.title,
       lat,
