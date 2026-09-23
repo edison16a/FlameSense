@@ -1,17 +1,19 @@
 # FlameSense
 
-Wildfire spread visualization, built at a Los Altos hackathon where it placed 3rd.
+**3rd Place, Los Altos hackathon.**
 
-FlameSense simulates how a wildfire might spread, using historical fire data and
-current weather like temperature, humidity and wind. Pick a point on the map and
-the predicted growth animates outward as a heat map.
+At Los Altos, we built FlameSense, which helps first responders and the public
+by simulating wildfire spread using a sequential neural network trained on
+historical fire data and current weather conditions like temperature, humidity,
+and wind. Users can select locations on a map to see predicted fire growth
+visualized as a heat map, helping with better resource planning and awareness.
 
 Live site: https://fire-space-front-end-git-main-edison16as-projects.vercel.app/
 
 ## What it does
 
-The landing page explains the project in five steps. The Predict view opens a
-map of California and does three things:
+The landing page explains the project. The Predict view opens a map of
+California and does three things:
 
 - Plots currently burning wildfires from NASA EONET as fire markers, each with a
   red circle sized from the event's reported burn area.
@@ -24,18 +26,41 @@ map of California and does three things:
 Clicking a fire marker looks up its location name and offers a Simulate Fire
 button, which runs the same animation starting from that fire's real size.
 
-## How it was built
+## How we built it
 
-1. **Data collection.** Current and historical wildfire and conditions data from
-   NASA FIRMS and Open-Meteo, covering humidity, temperature, dryness and
-   biomass. Palantir's tools cleaned and transformed it.
-2. **Training.** The cleaned data trained a model in Palantir that takes those
-   inputs and predicts a fire radius.
-3. **Exposing the function.** The model was converted to a TypeScript function
-   and exposed so JavaScript could call it.
-4. **Front end.** An HTML front end shows the map and animates the spread.
+### Step 1: Data Collection
 
-Next up: train on more data for better accuracy.
+![Data Collection](public/assets/data.png)
+
+We gathered current and historical wildfire and conditions data from various
+sources such as NASA FIRMS and Open Meteo. We collected factors such as
+humidity, temperature, dryness, and biomass. We then used Palantir's tools to
+clean and transform the data.
+
+### Step 2: Training
+
+We then used the cleaned data to train a model in Palantir which would take in
+current data inputs such as humidity, temperature, dryness, and biomass and
+outputs a predicted fire radius.
+
+### Step 3: Exposing Function
+
+![Data Integration](public/assets/expose.png)
+
+We then converted the model into a TypeScript function. Then we exposed the
+function to be called through JavaScript.
+
+### Step 4: FrontEnd
+
+![Model Training](public/assets/frontend.png)
+
+We built a front end in HTML which displays a map and animates how the fire will
+spread depending on a location.
+
+### Future Plans
+
+We plan to expand our model and train it with more data to make a more accurate
+prediction.
 
 ## Running it
 
@@ -57,6 +82,9 @@ npm run check      # both
 ```
 
 ## Architecture
+
+The site started as one 1165 line `index.html` holding all the markup, two
+stylesheets and four script blocks. It is now layered.
 
 ```
 public/
@@ -104,7 +132,7 @@ no code change and no rebuild. Edit the JSON and reload.
 
 | File | What it controls |
 | --- | --- |
-| `content.json` | Every visible string: nav labels, hero copy and photo, the five panels, overlay placeholders, footer, page title |
+| `content.json` | Every visible string: nav labels, hero copy and photo, the panels, overlay placeholders, the map readout labels, footer, page title |
 | `site.config.json` | API endpoints, map camera, tile layer, weather readout rows, EONET filtering, marker styling, geocoding |
 | `growth-model.json` | Coefficients for the growth score and the radius multiplier |
 | `fire-phases.json` | The two animation sequences, plus the wind bias and projection constants |
@@ -159,6 +187,18 @@ then add a row to `weather.readout`:
 The validator rejects a readout row whose key is never requested, since it would
 always render `undefined`.
 
+### Reword the map overlays
+
+The overlay heading, the growth label and the popup Location prefix live in
+`content.json` under `runtime`. The heading keeps its placeholders inline:
+
+```json
+"weatherHeading": "Current Data at Latitude {lat}, Longitude {lng}:"
+```
+
+`{lat}` and `{lng}` are filled in at render time. Both have to stay present, and
+the validator fails the run if either is dropped or misspelled.
+
 ### Retune the model or animation
 
 Edit `growth-model.json` and `fire-phases.json`. The validator enforces what the
@@ -182,8 +222,9 @@ test checks that a fresh extraction still matches the committed files exactly.
 ## Tests
 
 `npm test` covers the color ramp, geometry and wind bias, the growth model, the
-three API clients, the animation runner and the map controller. Leaflet, the
-DOM, `fetch` and randomness are stubbed, so it needs no network and no browser.
+three API clients, the animation runner, the map controller, the landing page
+renderer, view switching, the overlays and the data loader. Leaflet, the DOM,
+`fetch` and randomness are stubbed, so it needs no network and no browser.
 
 `npm run validate` checks the data files two ways. Structurally: unique ids,
 scroll targets that resolve, readout keys that get requested, valid colors,
