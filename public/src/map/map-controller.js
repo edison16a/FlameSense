@@ -4,7 +4,7 @@
  *
  * This is the only module that touches Leaflet directly besides the animator,
  * which is why the services and the growth model are handed to it rather than
- * imported here -- it composes them, it does not own them.
+ * imported here. It composes them, it does not own them.
  */
 
 import { createFireAnimator } from "./fire-animation.js";
@@ -21,7 +21,7 @@ import { fetchWeather, selectReading } from "../services/weather.js";
  * handed to Leaflet, which inserts it with innerHTML. Both strings come from
  * third parties. The place name is the dangerous one: Nominatim serves
  * OpenStreetMap data, which anyone can edit, so a crafted place name was a
- * script-injection vector into this page -- no authentication needed, just an
+ * script-injection vector into this page. No authentication needed, just an
  * OSM edit near a wildfire.
  *
  * Building nodes and assigning textContent closes that: the strings are now
@@ -30,7 +30,7 @@ import { fetchWeather, selectReading } from "../services/weather.js";
  * The simulate button also gets a real listener instead of an inline onclick
  * attribute. Besides removing a second injection surface (the coordinates were
  * interpolated into an attribute), this is what lets the handler stop being a
- * global -- inline handlers can only resolve names on window.
+ * global: inline handlers can only resolve names on window.
  *
  * @param {object} params
  * @param {string} params.title Event title, from EONET.
@@ -61,8 +61,8 @@ function buildPopup({ title, subtitle, buttonLabel, onSimulate }) {
 /**
  * Build the subtitle lines of a popup: a timestamp, then a location.
  *
- * Returned as nodes rather than a string for the same reason as above -- the
- * place name is untrusted -- and kept separate so the initial popup and the
+ * Returned as nodes rather than a string for the same reason as above, the
+ * place name being untrusted, and kept separate so the initial popup and the
  * geocoded rewrite cannot drift apart.
  *
  * @param {string} timestamp Already localised.
@@ -122,10 +122,10 @@ export function createMapController({ L, config, phases, growth, overlays }) {
       const { values, readout } = selectReading(config.weather, data);
       /*
        * WAS BROKEN: this tested the bearing for truthiness before storing it.
-       * A bearing of 0 is falsy, so a wind blowing from due north -- one of the
-       * 360 legal values, and the one a calm reading often reports -- was
-       * thrown away, leaving the fire bent by whatever the PREVIOUS location's
-       * wind had been. The stale value then silently steered the spread shape
+       * A bearing of 0 is falsy, so a wind blowing from due north was thrown
+       * away. It is one of the 360 legal values, and the one a calm reading
+       * often reports. Losing it left the fire bent by whatever the PREVIOUS
+       * location's wind had been. The stale value then silently steered the spread shape
        * at the new location.
        *
        * Test that the parse produced a number instead, so 0 is kept and only a
@@ -221,9 +221,8 @@ export function createMapController({ L, config, phases, growth, overlays }) {
    * WAS BROKEN: this ran unconditionally every time the Predict view opened,
    * calling L.map() again on a container Leaflet had already initialised.
    * Leaflet throws "Map container is already initialized" in that case, so the
-   * second visit -- Predict, then About, then Predict -- died with an
-   * exception and left a dead map behind. Guarding on the existing instance
-   * fixes it.
+   * second visit (Predict, then About, then Predict) died with an exception
+   * and left a dead map behind. Guarding on the existing instance fixes it.
    *
    * invalidateSize() is needed on re-entry because the section is display:none
    * while the landing page is showing. Leaflet caches the container size, and a

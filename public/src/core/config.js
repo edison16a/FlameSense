@@ -4,7 +4,7 @@
  * WHY a loader at all: every list, string, colour and coefficient the app uses
  * now lives under `public/data/`. Fetching them in one place means modules
  * receive plain configuration objects as arguments and stay ignorant of where
- * the data came from -- which is what lets them be imported and tested under
+ * the data came from. That is what lets them be imported and tested under
  * Node, where `fetch` of a relative path would not work.
  */
 

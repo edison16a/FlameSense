@@ -26,11 +26,11 @@
  *
  * WAS BROKEN: the original wrote `parseFloat(x) || fallback`, which treats a
  * parsed 0 as absent, because 0 is falsy. Every quantity this model reads can
- * legitimately be zero, so real readings were being replaced by invented ones:
- * a temperature of 0 C was scored as 20 C, and 0% relative humidity -- the
- * driest, highest-risk case there is -- was scored as a middling 50%. The
- * humidity case is the damaging one, since it pushed the growth score DOWN by
- * 15 points in precisely the conditions where fire spreads fastest.
+ * legitimately be zero, so real readings were being replaced by invented ones.
+ * A temperature of 0 C was scored as 20 C. Worse, 0% relative humidity, the
+ * driest and highest-risk case there is, was scored as a middling 50%. That
+ * humidity case is the damaging one: it pushed the growth score DOWN by 15
+ * points in precisely the conditions where fire spreads fastest.
  *
  * Checking for NaN instead of falsiness distinguishes "no reading" from
  * "a reading of zero".

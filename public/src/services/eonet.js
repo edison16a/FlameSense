@@ -1,8 +1,8 @@
 /**
  * NASA EONET wildfire-event client.
  *
- * EONET reports each event as a list of successive geometries -- one per
- * observation -- so a small amount of interpretation is needed before the data
+ * EONET reports each event as a list of successive geometries, one per
+ * observation, so a small amount of interpretation is needed before the data
  * is usable as map markers. That interpretation lives here rather than inside
  * the map so it can be tested against recorded payloads.
  */
@@ -41,7 +41,7 @@ export function impactRadiusFor(magnitudeAcres, config) {
  * Two decisions are encoded here. The *last* geometry of each event is used
  * because the list is chronological and the most recent observation is the one
  * worth plotting. Events older than the configured year are dropped, which is
- * how the map stays focused on the current season -- note this is a fixed year
+ * how the map stays focused on the current season. Note this is a fixed year
  * from configuration, not a rolling window.
  *
  * Coordinates arrive as `[longitude, latitude]` (GeoJSON order) and are

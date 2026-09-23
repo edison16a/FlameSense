@@ -2,7 +2,7 @@
  * Geometry for the fire blob: turning a centre, a radius and a set of per-vertex
  * offsets into latitude/longitude pairs, with the shape stretched downwind.
  *
- * Pure and framework-free on purpose -- it takes plain numbers and returns plain
+ * Pure and framework-free on purpose. It takes plain numbers and returns plain
  * arrays, so the wind bias and the metre-to-degree projection can be tested
  * without Leaflet.
  */

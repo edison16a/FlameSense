@@ -2,7 +2,7 @@
  * Switching between the landing page and the map view.
  *
  * The app has exactly two views and no router: it toggles `display` on the
- * landing-page elements and on the map section. That is kept as-is; this module
+ * landing-page elements and on the map section. That is kept as is. This module
  * just gives the toggle one home and drives it from the content data rather
  * than from a hard-coded list of five element ids.
  */
@@ -13,9 +13,9 @@
  * @param {object} deps
  * @param {object} deps.content Parsed `data/content.json`.
  * @param {HTMLElement[]} deps.steps Rendered content panels.
- * @param {() => void} deps.onEnterMap Called when the map view opens; this is
+ * @param {() => void} deps.onEnterMap Called when the map view opens. This is
  *   where the map gets created, which is why it is a callback rather than an
- *   import -- navigation must not depend on Leaflet.
+ *   import: navigation must not depend on Leaflet.
  * @param {Document} [deps.doc]
  */
 export function setupNavigation({ content, steps, onEnterMap, doc = document }) {
@@ -27,8 +27,8 @@ export function setupNavigation({ content, steps, onEnterMap, doc = document }) 
 
   function showMainPage() {
     demoMode = false;
-    // Explicitly 'flex', not '' -- the hero and the panels are flex containers
-    // and the stylesheet relies on it.
+    // Explicitly 'flex', not '', because the hero and the panels are flex
+    // containers and the stylesheet relies on it.
     hero.style.display = "flex";
     for (const step of steps) step.style.display = "flex";
     mapSection.style.display = "none";

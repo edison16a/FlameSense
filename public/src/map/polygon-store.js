@@ -45,8 +45,8 @@ export function createPolygonStore() {
      * Later phases are larger and would otherwise bury the earlier ones, hiding
      * the colour progression that is the whole point of the visualisation.
      * Iterating from the end forward works because each `bringToFront` moves
-     * one polygon above everything already raised, so the last one raised --
-     * index 0 -- finishes frontmost.
+     * one polygon above everything already raised. The last one raised is
+     * index 0, so it finishes frontmost.
      */
     bringSmallestToFront() {
       for (let i = polygons.length - 1; i >= 0; i--) {

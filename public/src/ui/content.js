@@ -13,8 +13,8 @@
 /**
  * Build one "How We Did It" panel.
  *
- * The structure mirrors the original markup exactly -- section.section.container
- * wrapping .image and .text -- because layout.css targets those class names and
+ * The structure mirrors the original markup exactly (section.section.container
+ * wrapping .image and .text) because layout.css targets those class names and
  * the IntersectionObserver reveal keys off `.section`.
  *
  * @param {{ id: string, image: string, alt: string, heading: string, body: string }} step
@@ -69,7 +69,7 @@ function renderNav(nav, content) {
  * Populate the hero banner.
  *
  * The heading is assembled from three content fields so the flickering flame
- * keeps its own <span> -- that span carries the CSS animation -- without the
+ * keeps its own <span> (that span carries the CSS animation) without the
  * content file needing to contain markup. Spaces are re-inserted between the
  * pieces because the extractor stores each part trimmed.
  */
