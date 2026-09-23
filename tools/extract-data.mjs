@@ -35,7 +35,7 @@ const REPO_ROOT = resolve(HERE, "..");
  *
  * The source is historical by design. Once the refactor landed, the working
  * tree's index.html became a skeleton with no copy in it, so there is nothing
- * left on disk to extract from -- the original page exists only in git. Reading
+ * left on disk to extract from. The original page exists only in git. Reading
  * from a fixed revision also means re-running this script is idempotent and
  * cannot be influenced by later edits to the working tree.
  */
@@ -119,7 +119,7 @@ function extractSteps(html) {
  * WHY a table rather than parsing: in the source each control's behaviour lived
  * in its own addEventListener block of imperative statements. There is no
  * reliable general parse of "what does this handler do", so the behaviour is
- * transcribed once here -- it is five short entries, not bulk data -- and
+ * transcribed once here, being five short entries rather than bulk data, and
  * emitted into the content file so that adding a nav entry later is a data edit.
  *
  * "home" means: if the map view is open, return to the landing page; otherwise

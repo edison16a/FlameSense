@@ -121,7 +121,7 @@ test("clicked: phases open exactly where the previous phase closed", () => {
 });
 
 test("existing: phases rebuild their opening ring, which is why the shape snaps", () => {
-  // Preserved shipped behaviour, not an oversight -- documented so nobody
+  // Preserved shipped behaviour, not an oversight. Documented so nobody
   // 'fixes' it into the smooth behaviour of the other sequence by accident.
   for (const phase of phases.sequences.existing.phases) {
     assert.equal(phase.startFrom, "recomputed");

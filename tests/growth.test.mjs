@@ -48,8 +48,8 @@ test("jitter stays within its configured band and never escapes the clamp", () =
 
 test("a reading of zero is used, not treated as missing", () => {
   // REGRESSION: the original parsed inputs as `parseFloat(x) || default`, and
-  // zero is falsy. A 0 C reading was scored as 20 C and 0% humidity -- the
-  // driest, highest-risk case -- was scored as a middling 50%, which pushed the
+  // zero is falsy. A 0 C reading was scored as 20 C, and 0% humidity, the
+  // driest and highest-risk case, was scored as a middling 50%. That pushed the
   // score DOWN by 15 points in exactly the conditions where fire spreads worst.
   const model = pinned();
   const freezing = parseFloat(

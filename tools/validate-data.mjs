@@ -4,14 +4,14 @@
  *
  * Two kinds of check, for two different failure modes:
  *
- *  1. STRUCTURAL -- does each file parse, carry the fields the code reads, and
+ *  1. STRUCTURAL. Does each file parse, carry the fields the code reads, and
  *     stay internally consistent (unique ids, resolvable scroll targets, well
  *     formed hex colours, images that exist on disk, phase tables whose shapes
  *     the animation runner can actually execute)? This catches a typo made
  *     while editing a data file by hand, which is now the normal way to change
  *     the site's content.
  *
- *  2. FIDELITY -- does the extracted content still match the pre-refactor page,
+ *  2. FIDELITY. Does the extracted content still match the pre-refactor page,
  *     byte for byte after whitespace normalisation? This is the check that the
  *     refactor did not silently lose or reword anything. It reads the original
  *     index.html straight out of git history, so it cannot be fooled by editing
@@ -44,7 +44,7 @@ const checks = [];
 /** Record a single assertion's outcome; collect rather than throw so one run reports everything. */
 function check(name, condition, detail = "") {
   checks.push(name);
-  if (!condition) failures.push(`${name}${detail ? ` -- ${detail}` : ""}`);
+  if (!condition) failures.push(`${name}${detail ? `: ${detail}` : ""}`);
 }
 
 const readJson = (name) => JSON.parse(readFileSync(resolve(DATA_DIR, name), "utf8"));
@@ -57,7 +57,7 @@ const cities = readJson("cities.json");
 
 /* ---------------------------------------------------------------- structural */
 
-// -- content.json ------------------------------------------------------------
+// --- content.json -----------------------------------------------------------
 check("content: has a document title", typeof content.document?.title === "string");
 check("content: hero has all rendered fields",
   ["headingBefore", "flame", "headingAfter", "tagline", "ctaId", "ctaLabel", "backgroundImage"]
@@ -95,7 +95,7 @@ check("content: control ids are unique", new Set(controlIds).size === controlIds
 check("content: both map overlays have placeholder copy",
   ["timeOverlay", "growthOverlay"].every((k) => typeof content.mapOverlays?.[k] === "string"));
 
-// -- site.config.json --------------------------------------------------------
+// --- site.config.json -------------------------------------------------------
 for (const [name, url] of [
   ["weather", site.weather.endpoint],
   ["eonet", site.eonet.endpoint],
@@ -116,7 +116,7 @@ check("site: readout keys are all requested from the API",
 check("site: acre conversion constant is exact", site.eonet.acresToSquareMetres === 4046.8564224);
 check("site: geocoding has place keys to try", site.geocoding.placeKeys.length > 0);
 
-// -- growth-model.json -------------------------------------------------------
+// --- growth-model.json ------------------------------------------------------
 const gp = growth.percentage;
 check("growth: clamp range is ordered", gp.clamp.min < gp.clamp.max);
 check("growth: jitter is centred on zero", gp.jitter.min + gp.jitter.range / 2 === 0,
@@ -128,7 +128,7 @@ check("growth: every coefficient is a finite number",
   [gp.base, gp.temperature.coefficient, gp.rain.coefficient, gp.humidity.coefficient,
    growth.factor.perPercent].every(Number.isFinite));
 
-// -- fire-phases.json --------------------------------------------------------
+// --- fire-phases.json -------------------------------------------------------
 const HEX = /^#[0-9a-f]{6}$/i;
 const wb = phases.geometry.windBias;
 check("phases: wind clamp range is ordered", wb.minFactor < wb.maxFactor);
@@ -178,7 +178,7 @@ check("phases: clicked sequence has its own base radius",
 check("phases: existing sequence takes its radius from the event, not config",
   phases.sequences.existing.baseRadiusMetres === undefined);
 
-// -- cities.json -------------------------------------------------------------
+// --- cities.json ------------------------------------------------------------
 check("cities: list is non-empty", cities.cities.length > 0);
 for (const city of cities.cities) {
   const [lat, lng] = city.coords;

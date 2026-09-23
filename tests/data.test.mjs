@@ -58,7 +58,7 @@ test("the city list survived extraction with all ten records intact", async () =
 test("the extractor reproduces the committed data files exactly", () => {
   // Re-runs extraction into a scratch directory and diffs. If this fails,
   // either the data files were hand-edited away from the original page, or the
-  // extractor drifted -- both worth knowing about.
+  // extractor drifted. Both are worth knowing about.
   const outDir = resolve(REPO_ROOT, "node_modules/.extract-check");
   execFileSync("node", ["tools/extract-data.mjs", "--out", outDir], {
     cwd: REPO_ROOT,
