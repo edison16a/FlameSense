@@ -28,8 +28,6 @@ button, which runs the same animation starting from that fire's real size.
 
 ### Step 1: Data Collection
 
-![Data Collection](public/assets/data.png)
-
 We gathered current and historical wildfire and conditions data from various
 sources such as NASA FIRMS and Open Meteo. We collected factors such as
 humidity, temperature, dryness, and biomass. We then used Palantir's tools to
@@ -43,14 +41,10 @@ outputs a predicted fire radius.
 
 ### Step 3: Exposing Function
 
-![Data Integration](public/assets/expose.png)
-
 We then converted the model into a TypeScript function. Then we exposed the
 function to be called through JavaScript.
 
 ### Step 4: FrontEnd
-
-![Model Training](public/assets/frontend.png)
 
 We built a front end in HTML which displays a map and animates how the fire will
 spread depending on a location.
